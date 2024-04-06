@@ -1,0 +1,11 @@
+#ifndef SLIMAKS_ZDARZENIELOSOWE_H
+#define SLIMAKS_ZDARZENIELOSOWE_H
+
+enum ZdarzenieLosowe {
+    BRAK = 0,
+    CHOROBA = 1,
+    ANOMALIA_TEMPERATUROWA = 2
+};
+
+
+#endif //SLIMAKS_ZDARZENIELOSOWE_H
