@@ -26,10 +26,6 @@ add_executable(Slimaks main.cpp
         headers/SymulowanyObiekt.h
         Akwarium.cpp
         headers/Akwarium.h
-        MlodySlimak.cpp
-        headers/MlodySlimak.h
-        DoroslySlimak.cpp
-        headers/DoroslySlimak.h
         interface/WizualizatorSymulacji.cpp
         interface/WizualizatorSymulacji.h
         interface/WizualizatorSymulacji.ui
