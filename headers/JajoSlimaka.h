@@ -4,7 +4,7 @@
 
 #include "Slimak.h"
 
-class JajoSlimaka {
+class JajoSlimaka : public SymulowanyObiekt {
 private:
     int czasDoWyklucia;
 

@@ -18,6 +18,7 @@ class Akwarium : public QObject {
 Q_OBJECT
 
 private:
+    std::vector<SymulowanyObiekt *> symulowaneObiekty = {};
     std::vector<Roslina *> rosliny = {};
     std::vector<Slimak *> slimaki = {};
     std::vector<JajoSlimaka *> jaja = {};
@@ -42,6 +43,8 @@ public:
     const Zdarzenie &getZdarzenieLosowe() const;
 
     void setZdarzenieLosowe(const Zdarzenie &zdarzenieLosowe);
+
+    const std::vector<SymulowanyObiekt *> &getSymulowaneObiekty() const;
 
 signals:
 

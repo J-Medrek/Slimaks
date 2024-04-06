@@ -1,23 +1,21 @@
 #include "headers/Symulacja.h"
-#include "headers/MlodySlimak.h"
-#include "headers/DoroslySlimak.h"
 #include <ctime>
 #include <cstdio>
 
+Symulacja::Symulacja(Akwarium *akwarium, const int poczatkowaIloscSlimakow, const int poczatkowaIloscRoslin) : akwarium(
+        akwarium), poczatkowaIloscSlimakow(poczatkowaIloscSlimakow), poczatkowaIloscRoslin(poczatkowaIloscRoslin) {}
 
 void Symulacja::run() {
     int numerIteracji = 0;
     for (int i = 0; i < poczatkowaIloscSlimakow; ++i) {
-        akwarium->dodajSlimaka(new DoroslySlimak(12, akwarium));
+        akwarium->dodajSlimaka(new Slimak(12, akwarium));
     }
     for (int i = 0; i < poczatkowaIloscRoslin; ++i) {
         akwarium->dodajRosline(new Roslina());
     }
-    akwarium->dodajSlimaka(new MlodySlimak(akwarium));
     double time_counter = 0;
     clock_t this_time = clock();
     clock_t last_time = this_time;
-
     while (!akwarium->getRosliny().empty() && !akwarium->getSlimaki().empty()) {
         this_time = clock();
         time_counter += (double) (this_time - last_time);
@@ -32,9 +30,6 @@ void Symulacja::run() {
     }
 
 }
-
-Symulacja::Symulacja(Akwarium *akwarium, const int poczatkowaIloscSlimakow, const int poczatkowaIloscRoslin) : akwarium(
-        akwarium), poczatkowaIloscSlimakow(poczatkowaIloscSlimakow), poczatkowaIloscRoslin(poczatkowaIloscRoslin) {}
 
 void Symulacja::symulujIteracje() {
     //losuj zdarzenie losowe
@@ -73,14 +68,9 @@ void Symulacja::symulujIteracje() {
     // SYMULUJEMY SLIMAKI I ROSLINY / Zdarzenie losowe bedzie symulowane przez Slimaki i Rosliny w ich klasach
 
 
-    for (Roslina *roslina: akwarium->getRosliny()) {
-        roslina->symulujZachowanie();
+    for (SymulowanyObiekt *symulowanyObiekt: akwarium->getSymulowaneObiekty()) {
+        symulowanyObiekt->symulujZachowanie();
     }
-
-    for (Slimak *slimak: akwarium->getSlimaki()) {
-        slimak->symulujZachowanie();
-    }
-
 
     // sprawdzamy czy jajka sie wykluwaja
 
