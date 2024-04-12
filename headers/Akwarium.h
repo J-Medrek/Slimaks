@@ -17,34 +17,44 @@ class JajoSlimaka;
 class Akwarium : public QObject {
 Q_OBJECT
 
-private:
-    std::vector<SymulowanyObiekt *> symulowaneObiekty = {};
-    std::vector<Roslina *> rosliny = {};
-    std::vector<Slimak *> slimaki = {};
-    std::vector<JajoSlimaka *> jaja = {};
-    int numerIteracji = 0;
-    Zdarzenie zdarzenieLosowe = Zdarzenie(0, ZdarzenieLosowe::BRAK);
-    int czasTrwaniaZdarzenia = 0;
-    int liczbaJaj;
-
 public:
-    const std::vector<Roslina *> &getRosliny() const;
 
-    const std::vector<Slimak *> &getSlimaki() const;
+    void dodajObiekt(std::unique_ptr<SymulowanyObiekt> obiekt);
 
-    void dodajSlimaka(Slimak *slimak);
-
-    void dodajRosline(Roslina *roslina);
+    void usunObiekt(const std::unique_ptr<SymulowanyObiekt> &obiekt);
 
     int getNumerIteracji() const;
 
     void ustawNumerIteracji(int numerIteracji);
 
-    const Zdarzenie &getZdarzenieLosowe() const;
+    const std::vector<std::unique_ptr<SymulowanyObiekt>> &getSymulowaneObiekty() const;
 
-    void setZdarzenieLosowe(const Zdarzenie &zdarzenieLosowe);
+    double getWzrostRoslin() const;
 
-    const std::vector<SymulowanyObiekt *> &getSymulowaneObiekty() const;
+    void setWzrostRoslin(double wzrostRoslin);
+
+    int iloscChorychSlimakow();
+
+    int getIloscJaj() const;
+
+    int getIloscRoslin() const;
+
+    int getIloscSlimakow() const;
+
+    Zdarzenie &getZdarzenie();
+
+    ~Akwarium() override;
+
+    double dziennaZarlocznosc();
+
+private:
+    std::vector<std::unique_ptr<SymulowanyObiekt>> symulowaneObiekty = {};
+    int numerIteracji = 0;
+    Zdarzenie zdarzenie = Zdarzenie(0, ZdarzenieLosowe::BRAK);
+    double wzrostRoslin;
+    int iloscJaj;
+    int iloscRoslin;
+    int iloscSlimakow;
 
 signals:
 

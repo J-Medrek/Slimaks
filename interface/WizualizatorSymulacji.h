@@ -33,7 +33,15 @@ private:
     Ui::WizualizatorSymulacji *ui;
     Akwarium *akwarium;
 
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
+
+    std::string generujOpisIteracji();
+
+    std::string generujOpisZdarzenia();
+
+    bool zwalidujWprowadzoneDane();
+
+    bool trwaSymulacja;
 
 };
 

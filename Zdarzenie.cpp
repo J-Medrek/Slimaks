@@ -7,4 +7,18 @@
 Zdarzenie::Zdarzenie(int czasTrwania, ZdarzenieLosowe zdarzenieLosowe) : czasTrwania(czasTrwania),
                                                                          zdarzenieLosowe(zdarzenieLosowe) {}
 
-Zdarzenie::Zdarzenie(int czasTrwania) : czasTrwania(czasTrwania) {}
+int Zdarzenie::getCzasTrwania() const {
+    return czasTrwania;
+}
+
+void Zdarzenie::setCzasTrwania(int czasTrwania) {
+    Zdarzenie::czasTrwania = czasTrwania;
+}
+
+ZdarzenieLosowe Zdarzenie::getZdarzenieLosowe() const {
+    return zdarzenieLosowe;
+}
+
+void Zdarzenie::setZdarzenieLosowe(ZdarzenieLosowe zdarzenieLosowe) {
+    Zdarzenie::zdarzenieLosowe = zdarzenieLosowe;
+}

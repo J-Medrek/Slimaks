@@ -4,11 +4,26 @@
 
 #include "Slimak.h"
 
+class Akwarium;
+
 class JajoSlimaka : public SymulowanyObiekt {
 private:
-    int czasDoWyklucia;
+    int czasDoWyklucia = 4;
+    Akwarium *akwarium;
+
+    void wykluj();
+
+public:
+    void symulujZachowanie() override;
+
+    void rysuj(QPainter *qp) override;
+
+    ~JajoSlimaka() override;
+
+    bool symulujEliminacje() override;
+
+    explicit JajoSlimaka(Akwarium *akwarium);
 
 };
-
 
 #endif //SLIMAKS_JAJOSLIMAKA_H

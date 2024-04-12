@@ -6,12 +6,13 @@
 #include "Roslina.h"
 #include "Akwarium.h"
 #include <QObject>
+#include <random>
 
 class Symulacja : public QObject {
 Q_OBJECT
 
 public:
-    Symulacja(Akwarium *akwarium, const int poczatkowaIloscSlimakow, const int poczatkowaIloscRoslin);
+    Symulacja(Akwarium *akwarium, int poczatkowaIloscSlimakow, int poczatkowaIloscRoslin);
 
 public slots:
 
@@ -21,8 +22,11 @@ private:
     Akwarium *akwarium;
     const int poczatkowaIloscSlimakow;
     const int poczatkowaIloscRoslin;
+    std::random_device rd;
 
     void symulujIteracje();
+
+    ZdarzenieLosowe losujZdarzenieLosowe();
 
 };
 

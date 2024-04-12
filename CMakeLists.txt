@@ -40,7 +40,6 @@ target_link_libraries(Slimaks
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        Qt::Charts
         Qt6::Concurrent
 )
 
