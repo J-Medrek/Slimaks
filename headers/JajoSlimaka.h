@@ -2,14 +2,18 @@
 #define SLIMAKS_JAJOSLIMAKA_H
 
 
-#include "Slimak.h"
+#include "Akwarium.h"
+#include "stale.h"
 
 class Akwarium;
 
 class JajoSlimaka : public SymulowanyObiekt {
 private:
-    int czasDoWyklucia = 4;
+    int czasDoWyklucia = stale::CZAS_WYKLUCIA;
     Akwarium *akwarium;
+    std::random_device rd;
+    int x;
+    int y;
 
     void wykluj();
 

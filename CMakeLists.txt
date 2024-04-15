@@ -34,6 +34,8 @@ add_executable(Slimaks main.cpp
         Zdarzenie.cpp
         headers/Zdarzenie.h
         headers/ZdarzenieLosowe.h
+        headers/stale.h
+        stale.cpp
 )
 
 target_link_libraries(Slimaks

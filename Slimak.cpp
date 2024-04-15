@@ -2,6 +2,7 @@
 
 #include "headers/Slimak.h"
 #include <QIcon>
+#include "headers/stale.h"
 
 Slimak::Slimak(int wiek, Akwarium *akwarium) : wiek(wiek), akwarium(akwarium) {}
 
@@ -14,8 +15,11 @@ void Slimak::symulujZachowanie() {
 
 void Slimak::wyznaczSymulowaneZmienne() {
     wiek += 1;
-    szansaNaWyzdrowienie = szansaNaWyzdrowienie + 0.1 <= 0.90 ? szansaNaWyzdrowienie + 0.1 : 0.90;
-    szansaNaChorobe = szansaNaChorobe - 0.1 >= 0.15 ? szansaNaChorobe - 0.1 : 0.15;
+    szansaNaWyzdrowienie =
+            szansaNaWyzdrowienie + 0.1 <= stale::MAKSYMALNA_SZANSA_NA_WYZDROWIENIE ? szansaNaWyzdrowienie + 0.01
+                                                                                   : stale::MAKSYMALNA_SZANSA_NA_WYZDROWIENIE;
+    szansaNaChorobe = szansaNaChorobe - 0.1 >= stale::MINIMALNA_SZANSA_NA_CHOROBE ? szansaNaChorobe - 0.01
+                                                                                  : stale::MINIMALNA_SZANSA_NA_CHOROBE;
     wyznaczZarlocznosc();
 }
 
@@ -40,35 +44,43 @@ void Slimak::zjedzRosline() {
 void Slimak::symulujChorobe() {
     std::mt19937 generator(rd());
     if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
-        std::discrete_distribution<> prawdopodobienstwoChoroby({1 - szansaNaChorobe, szansaNaChorobe});
-        std::discrete_distribution<> prawdopodobienstwoWyzdrowienia({1 - szansaNaWyzdrowienie, szansaNaWyzdrowienie});
-        if (choroba) {
-            if (prawdopodobienstwoWyzdrowienia(generator)) {
-                choroba = false;
-                szansaNaWyzdrowienie = szansaNaWyzdrowienie + 0.1 <= 0.90 ? szansaNaWyzdrowienie + 0.1 : 0.90;
-                szansaNaChorobe = szansaNaChorobe - 0.1 >= 0.15 ? szansaNaChorobe - 0.1 : 0.15;
-                dlugoscChoroby = 1;
-            } else {
-                dlugoscChoroby++;
-            }
+        if (akwarium->iloscChorychSlimakow() == 0 && akwarium->getZdarzenie().getCzasTrwania() == 1) {
+            choroba = true;
         } else {
-            if (prawdopodobienstwoChoroby(generator)) {
-                choroba = true;
-                dlugoscChoroby++;
+            std::discrete_distribution<> prawdopodobienstwoChoroby({1 - szansaNaChorobe, szansaNaChorobe});
+            std::discrete_distribution<> prawdopodobienstwoWyzdrowienia(
+                    {1 - szansaNaWyzdrowienie, szansaNaWyzdrowienie});
+            if (choroba) {
+                if (prawdopodobienstwoWyzdrowienia(generator)) {
+                    choroba = false;
+                    szansaNaWyzdrowienie = szansaNaWyzdrowienie + 0.01 <= stale::MAKSYMALNA_SZANSA_NA_WYZDROWIENIE
+                                           ? szansaNaWyzdrowienie + 0.01
+                                           : stale::MAKSYMALNA_SZANSA_NA_WYZDROWIENIE;
+                    szansaNaChorobe = szansaNaChorobe - 0.01 >= stale::MINIMALNA_SZANSA_NA_CHOROBE
+                                      ? szansaNaChorobe - 0.01
+                                      : stale::MINIMALNA_SZANSA_NA_CHOROBE;
+                    dlugoscChoroby = 1;
+                } else {
+                    dlugoscChoroby++;
+                }
+            } else {
+                if (prawdopodobienstwoChoroby(generator)) {
+                    choroba = true;
+                    dlugoscChoroby++;
+                }
             }
         }
-
     }
 }
 
 void Slimak::symulujRozmnazanie() {
-    //is July
     std::mt19937 generator(rd());
-    // if (akwarium->getNumerIteracji() % 29 == 23 && akwarium->getSlimaki().size() > 1) {
-    if (akwarium->getNumerIteracji() % 5 == 0) {
-        std::discrete_distribution<> prawdopodobienstwoRozmnazania({60, 40});
+    if (akwarium->getNumerIteracji() % 10 == 0 && akwarium->getIloscSlimakow() > 1) {
+        std::discrete_distribution<> prawdopodobienstwoRozmnazania({75, 15});
         if (prawdopodobienstwoRozmnazania(generator)) {
-            akwarium->dodajObiekt(std::make_unique<JajoSlimaka>(akwarium));
+            for (int i = 0; i < akwarium->getSzybkoscZasiedlania(); i++) {
+                akwarium->dodajObiekt(std::make_unique<JajoSlimaka>(akwarium));
+            }
         }
     }
 }
@@ -81,15 +93,13 @@ bool Slimak::symulujEliminacje() {
 }
 
 void Slimak::wyznaczZarlocznosc() {
-    // 0.30 dla x = 1 zwieksza sie do 0.60 dla x = 30, 30-120 0.60, 0.20
-    zarlocznosc = 0.20;
+    // 0.30 dla wiek = 1 zwieksza sie do 0.60 dla wiek = 30, zmniejsza sie do 0.20
     if (wiek <= 30) {
-        zarlocznosc = 0.30 + 0.30 * (wiek - 1) / 29;
-    } else if (wiek <= 120) {
-        zarlocznosc = 0.60;
-    } else if (wiek <= 180) {
-        zarlocznosc = 0.20 * (wiek - 120) / 60;
-    }
+        zarlocznosc = 0.30 + (0.65 - 0.30) * (wiek - 1) / (30 - 1);
+    } else if (wiek <= 60) {
+        zarlocznosc = 0.65;
+    } else
+        zarlocznosc = 0.20;
 }
 
 void Slimak::rysuj(QPainter *qp) {
