@@ -4,13 +4,20 @@
 #include "ZdarzenieLosowe.h"
 
 class Zdarzenie {
+private:
     int czasTrwania;
     ZdarzenieLosowe zdarzenieLosowe;
 
 public:
     Zdarzenie(int czasTrwania, ZdarzenieLosowe zdarzenieLosowe);
 
-    explicit Zdarzenie(int czasTrwania);
+    int getCzasTrwania() const;
+
+    void setCzasTrwania(int czasTrwania);
+
+    ZdarzenieLosowe getZdarzenieLosowe() const;
+
+    void setZdarzenieLosowe(ZdarzenieLosowe zdarzenieLosowe);
 };
 
 

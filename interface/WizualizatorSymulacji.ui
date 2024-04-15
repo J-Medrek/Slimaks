@@ -61,9 +61,9 @@ ilość roślin: .......
   <widget class="QSpinBox" name="iloscSlimakow">
    <property name="geometry">
     <rect>
-     <x>770</x>
+     <x>751</x>
      <y>120</y>
-     <width>42</width>
+     <width>61</width>
      <height>22</height>
     </rect>
    </property>
@@ -71,9 +71,9 @@ ilość roślin: .......
   <widget class="QDoubleSpinBox" name="wzrostRoslin">
    <property name="geometry">
     <rect>
-     <x>770</x>
+     <x>750</x>
      <y>150</y>
-     <width>61</width>
+     <width>81</width>
      <height>21</height>
     </rect>
    </property>
@@ -91,9 +91,9 @@ ilość roślin: .......
   <widget class="QSpinBox" name="szybkoscZasiedlania">
    <property name="geometry">
     <rect>
-     <x>770</x>
+     <x>751</x>
      <y>180</y>
-     <width>42</width>
+     <width>61</width>
      <height>22</height>
     </rect>
    </property>
@@ -127,11 +127,14 @@ ilość roślin: .......
   <widget class="QSpinBox" name="iloscRoslin">
    <property name="geometry">
     <rect>
-     <x>770</x>
+     <x>751</x>
      <y>90</y>
-     <width>42</width>
+     <width>61</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <number>10000</number>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">

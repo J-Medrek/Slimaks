@@ -1,6 +1,8 @@
 #include "headers/Symulacja.h"
+#include "headers/Zdarzenie.h"
 #include <ctime>
-#include <cstdio>
+#include <memory>
+#include <random>
 
 Symulacja::Symulacja(Akwarium *akwarium, const int poczatkowaIloscSlimakow, const int poczatkowaIloscRoslin) : akwarium(
         akwarium), poczatkowaIloscSlimakow(poczatkowaIloscSlimakow), poczatkowaIloscRoslin(poczatkowaIloscRoslin) {}
@@ -8,20 +10,19 @@ Symulacja::Symulacja(Akwarium *akwarium, const int poczatkowaIloscSlimakow, cons
 void Symulacja::run() {
     int numerIteracji = 0;
     for (int i = 0; i < poczatkowaIloscSlimakow; ++i) {
-        akwarium->dodajSlimaka(new Slimak(12, akwarium));
+        akwarium->dodajObiekt(std::make_unique<Slimak>(12, akwarium));
     }
     for (int i = 0; i < poczatkowaIloscRoslin; ++i) {
-        akwarium->dodajRosline(new Roslina());
+        akwarium->dodajObiekt(std::make_unique<Roslina>(akwarium->getWzrostRoslin()));
     }
     double time_counter = 0;
     clock_t this_time = clock();
     clock_t last_time = this_time;
-    while (!akwarium->getRosliny().empty() && !akwarium->getSlimaki().empty()) {
+    while (akwarium->getIloscRoslin() != 0 && akwarium->getIloscSlimakow() != 0) {
         this_time = clock();
         time_counter += (double) (this_time - last_time);
         if (time_counter > CLOCKS_PER_SEC) {
             time_counter -= CLOCKS_PER_SEC;
-            printf("%d\n", numerIteracji);
             symulujIteracje();
             numerIteracji++;
             akwarium->ustawNumerIteracji(numerIteracji);
@@ -32,47 +33,45 @@ void Symulacja::run() {
 }
 
 void Symulacja::symulujIteracje() {
-    //losuj zdarzenie losowe
-
-    //jesli jest czyli akwarium.getZdarzenie.getENUM() to symulujemy
-
-
-//    akwarium->setZdarzenieLosowe(Zdarzenie(0, ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA));
-
-
-    //CHOROBA
-
-    /*
-     * - slimaki same to sobie zrobia czyli:
-     * -ustawia czy chory/ zdrowy
-     * - flage dlugosci choroby jak sa chorzy
-     *
-     *
-     * POTEM czystki czyli: - usuwamy wszystkie Slimaki ktore choruja jakis czas
-     *
-     * - sprawdzamy ilosc chorych slimakow zeby sprawddzic czy choroba nadal byc powinna
-     * */
-
-
-    //ANOMALIA
-
-    /*
-     * zmniejszamy wzrost roslin
-     * usuwamy czesc jaj jak ANOMALIA czas trwania == 0
-     * */
-
-    //
-
-
-
-    // SYMULUJEMY SLIMAKI I ROSLINY / Zdarzenie losowe bedzie symulowane przez Slimaki i Rosliny w ich klasach
-
-
-    for (SymulowanyObiekt *symulowanyObiekt: akwarium->getSymulowaneObiekty()) {
-        symulowanyObiekt->symulujZachowanie();
+    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::BRAK) {
+        akwarium->getZdarzenie().setZdarzenieLosowe(losujZdarzenieLosowe());
+        akwarium->getZdarzenie().setCzasTrwania(1);
+    } else {
+        akwarium->getZdarzenie().setCzasTrwania(akwarium->getZdarzenie().getCzasTrwania() + 1);
     }
 
-    // sprawdzamy czy jajka sie wykluwaja
+    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
+        if (akwarium->iloscChorychSlimakow() == 0) {
+            akwarium->getZdarzenie().setCzasTrwania(0);
+            akwarium->getZdarzenie().setZdarzenieLosowe(ZdarzenieLosowe::BRAK);
+        }
+    }
 
-    // zmniejszamy czas wyklucia o 1
+    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA) {
+        if (akwarium->getZdarzenie().getCzasTrwania() == 15) {
+            akwarium->getZdarzenie().setZdarzenieLosowe(ZdarzenieLosowe::BRAK);
+            akwarium->getZdarzenie().setCzasTrwania(0);
+        }
+    }
+
+    int i = 0;
+    while (i < akwarium->getSymulowaneObiekty().size()) {
+        akwarium->getSymulowaneObiekty()[i]->symulujZachowanie();
+        i++;
+    }
+
+    i = 0;
+    while (i < akwarium->getSymulowaneObiekty().size()) {
+        if (akwarium->getSymulowaneObiekty()[i]->symulujEliminacje()) {
+            akwarium->usunObiekt(akwarium->getSymulowaneObiekty()[i]);
+        } else {
+            i++;
+        }
+    }
+}
+
+ZdarzenieLosowe Symulacja::losujZdarzenieLosowe() {
+    std::mt19937 generator(rd());
+    std::discrete_distribution<> prawdopodobienstwoZdarzenLosowych({0.20, 0.40, 0.40});
+    return ZdarzenieLosowe(prawdopodobienstwoZdarzenLosowych(generator));
 }
