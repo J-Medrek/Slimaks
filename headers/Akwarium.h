@@ -45,16 +45,33 @@ public:
 
     ~Akwarium() override;
 
-    double dziennaZarlocznosc();
+    double calkowitaZarlocznosc();
+
+    double calkowitaIloscRoslin();
+
+    int getPoczatkowaIloscRoslin() const;
+
+    void setPoczatkowaIloscRoslin(int poczatkowaIloscRoslin);
+
+    int getPoczatkowaIloscSlimakow() const;
+
+    void setPoczatkowaIloscSlimakow(int poczatkowaIloscSlimakow);
+
+    int getSzybkoscZasiedlania() const;
+
+    void setSzybkoscZasiedlania(int szybkoscZasiedlania);
 
 private:
     std::vector<std::unique_ptr<SymulowanyObiekt>> symulowaneObiekty = {};
     int numerIteracji = 0;
     Zdarzenie zdarzenie = Zdarzenie(0, ZdarzenieLosowe::BRAK);
     double wzrostRoslin;
+    int poczatkowaIloscRoslin;
+    int poczatkowaIloscSlimakow;
     int iloscJaj;
     int iloscRoslin;
     int iloscSlimakow;
+    int szybkoscZasiedlania;
 
 signals:
 

@@ -7,7 +7,6 @@
 
 #include <QWidget>
 #include <QFutureWatcher>
-#include <QtConcurrent>
 #include "../headers/Slimak.h"
 #include "../headers/Akwarium.h"
 
@@ -19,21 +18,27 @@ class WizualizatorSymulacji : public QWidget {
 Q_OBJECT
 
 public:
-    explicit WizualizatorSymulacji(QWidget *parent = nullptr);
+    explicit WizualizatorSymulacji(Akwarium *akwarium, QWidget *parent = nullptr);
 
     ~WizualizatorSymulacji() override;
 
-private slots:
+public slots:
 
     void start();
 
-    void drawObjects(QPainter *qp);
+signals:
+
+    void rozpocznijSymulacje();
+
+    void rozpocznijIteracje();
 
 private:
     Ui::WizualizatorSymulacji *ui;
     Akwarium *akwarium;
 
     void paintEvent(QPaintEvent *event) override;
+
+    void drawObjects(QPainter *qp);
 
     std::string generujOpisIteracji();
 
@@ -42,6 +47,9 @@ private:
     bool zwalidujWprowadzoneDane();
 
     bool trwaSymulacja;
+
+    int poprzedniaIteracja = 0;
+
 
 };
 

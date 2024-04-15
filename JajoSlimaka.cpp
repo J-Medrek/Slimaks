@@ -9,7 +9,7 @@ void JajoSlimaka::symulujZachowanie() {
 }
 
 void JajoSlimaka::rysuj(QPainter *qp) {
-
+    qp->drawEllipse(x, y, 5, 5);
 }
 
 bool JajoSlimaka::symulujEliminacje() {
@@ -25,6 +25,11 @@ bool JajoSlimaka::symulujEliminacje() {
 }
 
 JajoSlimaka::JajoSlimaka(Akwarium *akwarium) : akwarium(akwarium) {
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> xDistribution(0, 675);
+    std::uniform_int_distribution<int> yDistribution(0, 625);
+    x = xDistribution(generator);
+    y = yDistribution(generator);
 }
 
 void JajoSlimaka::wykluj() {

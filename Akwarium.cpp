@@ -86,7 +86,7 @@ int Akwarium::getIloscSlimakow() const {
     return iloscSlimakow;
 }
 
-double Akwarium::dziennaZarlocznosc() {
+double Akwarium::calkowitaZarlocznosc() {
     double dziennaZarlocznosc = 0;
     for (const auto &obiekt: symulowaneObiekty) {
         if (auto slimak = dynamic_cast<Slimak *>(obiekt.get())) {
@@ -94,5 +94,39 @@ double Akwarium::dziennaZarlocznosc() {
         }
     }
     return dziennaZarlocznosc;
+}
+
+int Akwarium::getPoczatkowaIloscRoslin() const {
+    return poczatkowaIloscRoslin;
+}
+
+void Akwarium::setPoczatkowaIloscRoslin(int poczatkowaIloscRoslin) {
+    Akwarium::poczatkowaIloscRoslin = poczatkowaIloscRoslin;
+}
+
+int Akwarium::getPoczatkowaIloscSlimakow() const {
+    return poczatkowaIloscSlimakow;
+}
+
+void Akwarium::setPoczatkowaIloscSlimakow(int poczatkowaIloscSlimakow) {
+    Akwarium::poczatkowaIloscSlimakow = poczatkowaIloscSlimakow;
+}
+
+double Akwarium::calkowitaIloscRoslin() {
+    double dziennaZarlocznosc = 0;
+    for (const auto &obiekt: symulowaneObiekty) {
+        if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
+            dziennaZarlocznosc += roslina->getWielkosc();
+        }
+    }
+    return dziennaZarlocznosc;
+}
+
+int Akwarium::getSzybkoscZasiedlania() const {
+    return szybkoscZasiedlania;
+}
+
+void Akwarium::setSzybkoscZasiedlania(int szybkoscZasiedlania) {
+    Akwarium::szybkoscZasiedlania = szybkoscZasiedlania;
 }
 

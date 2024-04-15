@@ -10,39 +10,34 @@
 #include <QHBoxLayout>
 #include <iostream>
 
-std::mutex akwariumMutex;
 
 std::map<ZdarzenieLosowe, std::string> NAZWY_ZDARZEN{{ZdarzenieLosowe::BRAK,                   "BRAK"},
                                                      {ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA, "ANOMALIA TEMPERATUROWA"},
                                                      {ZdarzenieLosowe::CHOROBA,                "CHOROBA"}};
 
-
-WizualizatorSymulacji::WizualizatorSymulacji(QWidget *parent) :
-        QWidget(parent), ui(new Ui::WizualizatorSymulacji) {
-    akwarium = new Akwarium();
+WizualizatorSymulacji::WizualizatorSymulacji(Akwarium *akwarium, QWidget *parent) :
+        QWidget(parent), ui(new Ui::WizualizatorSymulacji), akwarium(akwarium) {
     ui->setupUi(this);
     connect(ui->pushButton, &QPushButton::clicked,
             this, [this] { start(); });
-    connect(akwarium, &Akwarium::nastepnaIteracja, this, [this] { update(); });
     auto *mainLayout = new QVBoxLayout(this);
     ui->widget->setLayout(mainLayout);
 }
 
 void WizualizatorSymulacji::start() {
     if (zwalidujWprowadzoneDane() && !trwaSymulacja) {
+        akwarium->setPoczatkowaIloscRoslin(ui->iloscRoslin->value());
+        akwarium->setPoczatkowaIloscSlimakow(ui->iloscSlimakow->value());
         akwarium->setWzrostRoslin(ui->wzrostRoslin->value());
-        auto *watekSymulacji = new QThread(this);
-        auto *symulacja = new Symulacja(akwarium, ui->iloscSlimakow->value(), ui->iloscRoslin->value());
-        symulacja->moveToThread(watekSymulacji);
-        connect(watekSymulacji, &QThread::started, symulacja, &Symulacja::run);
-        watekSymulacji->start();
+        akwarium->setSzybkoscZasiedlania(ui->szybkoscZasiedlania->value());
         trwaSymulacja = true;
+        emit rozpocznijSymulacje();
     }
 }
 
 void WizualizatorSymulacji::paintEvent(QPaintEvent *e) {
-    QPainter painter(this);
-    drawObjects(&painter);
+    QPainter qp(this);
+    drawObjects(&qp);
 }
 
 WizualizatorSymulacji::~WizualizatorSymulacji() {
@@ -52,20 +47,19 @@ WizualizatorSymulacji::~WizualizatorSymulacji() {
 
 void WizualizatorSymulacji::drawObjects(QPainter *qp) {
     QPen pen(Qt::black, 2, Qt::SolidLine);
-    if (!akwarium->getSymulowaneObiekty().empty()) {
-        akwariumMutex.lock();
-        for (int i = 0; i < akwarium->getSymulowaneObiekty().size(); ++i) {
-            auto obiekt = akwarium->getSymulowaneObiekty()[i].get();
-            obiekt->rysuj(qp);
-        }
-/*        for (const auto &obiekt: akwarium->getSymulowaneObiekty()) {
-            obiekt->rysuj(qp);
-        }*/
-    }
     qp->setPen(pen);
     qp->drawRect(0, 0, 700, 650);
     ui->plainTextEdit->setPlainText(QString::fromStdString(generujOpisIteracji()));
-    akwariumMutex.unlock();
+    if (!akwarium->getSymulowaneObiekty().empty()) {
+        for (const auto &obiekt: akwarium->getSymulowaneObiekty()) {
+            obiekt->rysuj(qp);
+        }
+    }
+    if (akwarium->getNumerIteracji() == poprzedniaIteracja + 1) {
+        poprzedniaIteracja++;
+        emit rozpocznijIteracje();
+    }
+
 }
 
 std::string WizualizatorSymulacji::generujOpisIteracji() {
@@ -73,10 +67,11 @@ std::string WizualizatorSymulacji::generujOpisIteracji() {
                        + "Ilosc slimakow: " + std::to_string(akwarium->getIloscSlimakow()) + "\n"
                        + "Ilosc roslin: " + std::to_string(akwarium->getIloscRoslin()) + "\n"
                        + "Ilosc jaj: " + std::to_string(akwarium->getIloscJaj()) + "\n"
-                       + "Dzienna zarlocznosc: " + std::to_string(akwarium->dziennaZarlocznosc()) + "\n"
+                       + "Calkowita zarlocznosc: " + std::to_string(akwarium->calkowitaZarlocznosc()) + "\n"
+                       + "Calkowita ilosc roslin: " + std::to_string(akwarium->calkowitaIloscRoslin()) + "\n"
                        + "Codzienny wzrost roslin: " +
                        std::to_string(akwarium->getIloscRoslin() * akwarium->getWzrostRoslin() -
-                                      akwarium->dziennaZarlocznosc()) + "\n"
+                                      akwarium->calkowitaZarlocznosc()) + "\n"
                        + generujOpisZdarzenia());
 }
 

@@ -1,11 +1,12 @@
 
 
+#include <iostream>
 #include "headers/Roslina.h"
 
 Roslina::Roslina(double predkoscWzrostu) : predkoscWzrostu(predkoscWzrostu) {
     std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> xDistribution(0, 600);
-    std::uniform_int_distribution<int> yDistribution(0, 600);
+    std::uniform_int_distribution<int> xDistribution(0, 675);
+    std::uniform_int_distribution<int> yDistribution(0, 625);
     x = xDistribution(generator);
     y = yDistribution(generator);
 }
@@ -24,7 +25,8 @@ void Roslina::setWielkosc(double wielkosc) {
 
 void Roslina::rysuj(QPainter *qp) {
     QPixmap pixmap("interface\\icons\\grass.png");
-    pixmap = pixmap.scaled(50, 50);
+    int skala = 10 * wielkosc < 30 ? 10 * wielkosc : 30;
+    pixmap = pixmap.scaled(skala, skala);
     qp->drawPixmap(x, y, pixmap);
 }
 

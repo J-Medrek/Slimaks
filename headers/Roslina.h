@@ -2,7 +2,6 @@
 #define SLIMAKS_ROSLINA_H
 
 #include <random>
-#include <iostream>
 #include "SymulowanyObiekt.h"
 
 class Roslina : public SymulowanyObiekt {
