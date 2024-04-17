@@ -75,9 +75,6 @@ std::string WizualizatorSymulacji::generujOpisIteracji() {
                        + "Ilosc jaj: " + std::to_string(akwarium->wyznaczIloscObiektow<JajoSlimaka>()) + "\n"
                        + "Calkowita zarlocznosc: " + std::to_string(akwarium->calkowitaZarlocznosc()) + "\n"
                        + "Calkowita ilosc roslin: " + std::to_string(akwarium->calkowitaIloscRoslin()) + "\n"
-                       + "Codzienny wzrost roslin: " +
-                       std::to_string(akwarium->wyznaczIloscObiektow<Roslina>() * akwarium->wezWzrostRoslin() -
-                                      akwarium->calkowitaZarlocznosc()) + "\n"
                        + generujOpisZdarzenia());
 }
 

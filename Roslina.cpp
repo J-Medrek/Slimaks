@@ -25,7 +25,7 @@ void Roslina::ustawWielkosc(double wielkosc) {
 
 void Roslina::rysuj(QPainter *qp) {
     QPixmap pixmap("interface\\icons\\grass.png");
-    int skala = 10 * wielkosc < 30 ? 10 * wielkosc : 30;
+    int skala = 100 * wielkosc < 30 ? 100 * wielkosc : 30;
     pixmap = pixmap.scaled(skala, skala);
     qp->drawPixmap(x, y, pixmap);
 }
