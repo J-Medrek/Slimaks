@@ -25,17 +25,19 @@ void Slimak::wyznaczSymulowaneZmienne() {
 
 void Slimak::zjedzRosline() {
     double doZjedzenia = zarlocznosc;
-    for (auto &obiekt: akwarium->wezSymulowaneObiekty()) {
-        if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
-            if (roslina->wezWielkosc() >= doZjedzenia) {
-                roslina->ustawWielkosc(roslina->wezWielkosc() - doZjedzenia);
-                doZjedzenia = 0;
-            } else {
-                roslina->ustawWielkosc(0);
-                doZjedzenia -= roslina->wezWielkosc();
-            }
-            if (!doZjedzenia) {
-                break;
+    if (akwarium->calkowitaIloscRoslin() > zarlocznosc) {
+        for (auto &obiekt: akwarium->wezSymulowaneObiekty()) {
+            if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
+                if (roslina->wezWielkosc() >= doZjedzenia) {
+                    roslina->ustawWielkosc(roslina->wezWielkosc() - doZjedzenia);
+                    doZjedzenia = 0;
+                } else {
+                    roslina->ustawWielkosc(0);
+                    doZjedzenia -= roslina->wezWielkosc();
+                }
+                if (!doZjedzenia) {
+                    break;
+                }
             }
         }
     }

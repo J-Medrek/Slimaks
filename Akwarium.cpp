@@ -74,13 +74,13 @@ int Akwarium::wezPoczatkowaIloscSlimakow() const {
 }
 
 double Akwarium::calkowitaIloscRoslin() {
-    double dziennaZarlocznosc = 0;
+    double wielkosc = 0;
     for (const auto &obiekt: symulowaneObiekty) {
         if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
-            dziennaZarlocznosc += roslina->wezWielkosc();
+            wielkosc += roslina->wezWielkosc();
         }
     }
-    return dziennaZarlocznosc;
+    return wielkosc;
 }
 
 int Akwarium::wezSzybkoscZasiedlania() const {
@@ -122,4 +122,3 @@ double Akwarium::wezSpadekWzrostuRoslin() const {
 int Akwarium::wezCzasTrwaniaAnomalii() const {
     return czasTrwaniaAnomalii;
 }
-
