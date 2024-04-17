@@ -3,7 +3,7 @@
 #include <iostream>
 #include "headers/Roslina.h"
 
-Roslina::Roslina(double predkoscWzrostu) : predkoscWzrostu(predkoscWzrostu) {
+Roslina::Roslina(Akwarium *akwarium) : akwarium(akwarium) {
     std::mt19937 generator(rd());
     std::uniform_int_distribution<int> xDistribution(0, 675);
     std::uniform_int_distribution<int> yDistribution(0, 625);
@@ -12,14 +12,14 @@ Roslina::Roslina(double predkoscWzrostu) : predkoscWzrostu(predkoscWzrostu) {
 }
 
 void Roslina::symulujZachowanie() {
-    wielkosc += predkoscWzrostu;
+    wielkosc += akwarium->wezWzrostRoslin();
 }
 
-double Roslina::getWielkosc() const {
+double Roslina::wezWielkosc() const {
     return wielkosc;
 }
 
-void Roslina::setWielkosc(double wielkosc) {
+void Roslina::ustawWielkosc(double wielkosc) {
     Roslina::wielkosc = wielkosc;
 }
 
@@ -40,4 +40,3 @@ bool Roslina::symulujEliminacje() {
     }
     return false;
 }
-

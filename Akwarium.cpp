@@ -7,50 +7,31 @@
 
 
 void Akwarium::dodajObiekt(std::unique_ptr<SymulowanyObiekt> obiekt) {
-    if (dynamic_cast<Roslina *>(obiekt.get())) {
-        iloscRoslin++;
-    }
-    if (dynamic_cast<Slimak *>(obiekt.get())) {
-        iloscSlimakow++;
-    }
-    if (dynamic_cast<JajoSlimaka *>(obiekt.get())) {
-        iloscJaj++;
-    }
     symulowaneObiekty.push_back(std::move(obiekt));
 }
 
 void Akwarium::usunObiekt(const std::unique_ptr<SymulowanyObiekt> &obiekt) {
-    if (dynamic_cast<Roslina *>(obiekt.get())) {
-        iloscRoslin--;
-    }
-    if (dynamic_cast<Slimak *>(obiekt.get())) {
-        iloscSlimakow--;
-    }
-    if (dynamic_cast<JajoSlimaka *>(obiekt.get())) {
-        iloscJaj--;
-    }
     symulowaneObiekty.erase(std::find(symulowaneObiekty.begin(), symulowaneObiekty.end(), obiekt));
 }
 
-int Akwarium::getNumerIteracji() const {
+int Akwarium::wezNumerIteracji() const {
     return numerIteracji;
 }
 
-void Akwarium::ustawNumerIteracji(int numerIteracji) {
-    Akwarium::numerIteracji = numerIteracji;
-    emit nastepnaIteracja();
+void Akwarium::zwiekszNumerIteracji() {
+    Akwarium::numerIteracji++;
 }
 
 
-const std::vector<std::unique_ptr<SymulowanyObiekt>> &Akwarium::getSymulowaneObiekty() const {
+const std::vector<std::unique_ptr<SymulowanyObiekt>> &Akwarium::wezSymulowaneObiekty() const {
     return symulowaneObiekty;
 }
 
-double Akwarium::getWzrostRoslin() const {
+double Akwarium::wezWzrostRoslin() const {
     return wzrostRoslin;
 }
 
-void Akwarium::setWzrostRoslin(double wzrostRoslin) {
+void Akwarium::ustawWzrostRoslin(double wzrostRoslin) {
     Akwarium::wzrostRoslin = wzrostRoslin;
 }
 
@@ -58,14 +39,14 @@ int Akwarium::iloscChorychSlimakow() {
     int iloscChorych = 0;
     for (const auto &obiekt: symulowaneObiekty) {
         if (auto slimak = dynamic_cast<Slimak *>(obiekt.get())) {
-            iloscChorych += slimak->isChoroba();
+            iloscChorych += slimak->wezChoroba();
         }
     }
     return iloscChorych;
 }
 
 
-Zdarzenie &Akwarium::getZdarzenie() {
+Zdarzenie &Akwarium::wezZdarzenie() {
     return zdarzenie;
 }
 
@@ -74,59 +55,71 @@ Akwarium::~Akwarium() {
     symulowaneObiekty.clear();
 }
 
-int Akwarium::getIloscJaj() const {
-    return iloscJaj;
-}
-
-int Akwarium::getIloscRoslin() const {
-    return iloscRoslin;
-}
-
-int Akwarium::getIloscSlimakow() const {
-    return iloscSlimakow;
-}
-
 double Akwarium::calkowitaZarlocznosc() {
     double dziennaZarlocznosc = 0;
     for (const auto &obiekt: symulowaneObiekty) {
         if (auto slimak = dynamic_cast<Slimak *>(obiekt.get())) {
-            dziennaZarlocznosc += slimak->getZarlocznosc();
+            dziennaZarlocznosc += slimak->wezZarlocznosc();
         }
     }
     return dziennaZarlocznosc;
 }
 
-int Akwarium::getPoczatkowaIloscRoslin() const {
+int Akwarium::wezPoczatkowaIloscRoslin() const {
     return poczatkowaIloscRoslin;
 }
 
-void Akwarium::setPoczatkowaIloscRoslin(int poczatkowaIloscRoslin) {
-    Akwarium::poczatkowaIloscRoslin = poczatkowaIloscRoslin;
-}
-
-int Akwarium::getPoczatkowaIloscSlimakow() const {
+int Akwarium::wezPoczatkowaIloscSlimakow() const {
     return poczatkowaIloscSlimakow;
-}
-
-void Akwarium::setPoczatkowaIloscSlimakow(int poczatkowaIloscSlimakow) {
-    Akwarium::poczatkowaIloscSlimakow = poczatkowaIloscSlimakow;
 }
 
 double Akwarium::calkowitaIloscRoslin() {
     double dziennaZarlocznosc = 0;
     for (const auto &obiekt: symulowaneObiekty) {
         if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
-            dziennaZarlocznosc += roslina->getWielkosc();
+            dziennaZarlocznosc += roslina->wezWielkosc();
         }
     }
     return dziennaZarlocznosc;
 }
 
-int Akwarium::getSzybkoscZasiedlania() const {
+int Akwarium::wezSzybkoscZasiedlania() const {
     return szybkoscZasiedlania;
 }
 
-void Akwarium::setSzybkoscZasiedlania(int szybkoscZasiedlania) {
+void Akwarium::ustawZmienneSymulacji(int iloscSlimakow, int iloscRoslin, double wzrostRoslin, int szybkoscZasiedlania,
+                                     double szansaAnomalia, double szansaChoroba, double spadekWzrostuRoslin,
+                                     int czasTrwaniaAnomalii) {
+    if (szansaAnomalia + szansaChoroba > 1.0) {
+        throw std::runtime_error("Szansa na anomalię i szansa na chorobę nie mogą być razem większe niż 1");
+    }
+    if (wzrostRoslin <= spadekWzrostuRoslin) {
+        throw std::runtime_error(
+                "Spadek wzrostu roślin w trakcie anomali nie powinien być mniejszy od stałego wzrostu");
+    }
+    Akwarium::poczatkowaIloscSlimakow = iloscSlimakow;
+    Akwarium::poczatkowaIloscRoslin = iloscRoslin;
+    Akwarium::wzrostRoslin = wzrostRoslin;
     Akwarium::szybkoscZasiedlania = szybkoscZasiedlania;
+    Akwarium::szansaAnomalia = szansaAnomalia;
+    Akwarium::szansaChoroba = szansaChoroba;
+    Akwarium::czasTrwaniaAnomalii = czasTrwaniaAnomalii;
+    Akwarium::spadekWzrostuRoslin = spadekWzrostuRoslin;
+}
+
+double Akwarium::wezSzansaAnomalia() const {
+    return szansaAnomalia;
+}
+
+double Akwarium::wezSzansaChoroba() const {
+    return szansaChoroba;
+}
+
+double Akwarium::wezSpadekWzrostuRoslin() const {
+    return spadekWzrostuRoslin;
+}
+
+int Akwarium::wezCzasTrwaniaAnomalii() const {
+    return czasTrwaniaAnomalii;
 }
 

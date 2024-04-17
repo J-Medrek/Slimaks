@@ -25,14 +25,14 @@ void Slimak::wyznaczSymulowaneZmienne() {
 
 void Slimak::zjedzRosline() {
     double doZjedzenia = zarlocznosc;
-    for (auto &obiekt: akwarium->getSymulowaneObiekty()) {
+    for (auto &obiekt: akwarium->wezSymulowaneObiekty()) {
         if (auto roslina = dynamic_cast<Roslina *>(obiekt.get())) {
-            if (roslina->getWielkosc() >= doZjedzenia) {
-                roslina->setWielkosc(roslina->getWielkosc() - doZjedzenia);
+            if (roslina->wezWielkosc() >= doZjedzenia) {
+                roslina->ustawWielkosc(roslina->wezWielkosc() - doZjedzenia);
                 doZjedzenia = 0;
             } else {
-                roslina->setWielkosc(0);
-                doZjedzenia -= roslina->getWielkosc();
+                roslina->ustawWielkosc(0);
+                doZjedzenia -= roslina->wezWielkosc();
             }
             if (!doZjedzenia) {
                 break;
@@ -43,14 +43,16 @@ void Slimak::zjedzRosline() {
 
 void Slimak::symulujChorobe() {
     std::mt19937 generator(rd());
-    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
-        if (akwarium->iloscChorychSlimakow() == 0 && akwarium->getZdarzenie().getCzasTrwania() == 1) {
+    if (akwarium->wezZdarzenie().wezZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
+        // jesli nie ma chorych ślimaków i zdarzenie się właśnie rozpoczęło, zostań pacjentem zero
+        if (akwarium->iloscChorychSlimakow() == 0 && akwarium->wezZdarzenie().wezCzasTrwania() == 1) {
             choroba = true;
         } else {
             std::discrete_distribution<> prawdopodobienstwoChoroby({1 - szansaNaChorobe, szansaNaChorobe});
             std::discrete_distribution<> prawdopodobienstwoWyzdrowienia(
                     {1 - szansaNaWyzdrowienie, szansaNaWyzdrowienie});
             if (choroba) {
+                //jesli slimak wyzdrowial zwieksz odporność
                 if (prawdopodobienstwoWyzdrowienia(generator)) {
                     choroba = false;
                     szansaNaWyzdrowienie = szansaNaWyzdrowienie + 0.01 <= stale::MAKSYMALNA_SZANSA_NA_WYZDROWIENIE
@@ -59,7 +61,7 @@ void Slimak::symulujChorobe() {
                     szansaNaChorobe = szansaNaChorobe - 0.01 >= stale::MINIMALNA_SZANSA_NA_CHOROBE
                                       ? szansaNaChorobe - 0.01
                                       : stale::MINIMALNA_SZANSA_NA_CHOROBE;
-                    dlugoscChoroby = 1;
+                    dlugoscChoroby = 0;
                 } else {
                     dlugoscChoroby++;
                 }
@@ -75,10 +77,11 @@ void Slimak::symulujChorobe() {
 
 void Slimak::symulujRozmnazanie() {
     std::mt19937 generator(rd());
-    if (akwarium->getNumerIteracji() % 10 == 0 && akwarium->getIloscSlimakow() > 1) {
-        std::discrete_distribution<> prawdopodobienstwoRozmnazania({75, 15});
+    if (akwarium->wezNumerIteracji() % 10 == 0 && akwarium->wyznaczIloscObiektow<Slimak>() > 1) {
+        std::discrete_distribution<> prawdopodobienstwoRozmnazania(
+                {1 - stale::PRAWDOPODOBIENSTWO_ROZMNAZANIA, stale::PRAWDOPODOBIENSTWO_ROZMNAZANIA});
         if (prawdopodobienstwoRozmnazania(generator)) {
-            for (int i = 0; i < akwarium->getSzybkoscZasiedlania(); i++) {
+            for (int i = 0; i < akwarium->wezSzybkoscZasiedlania(); i++) {
                 akwarium->dodajObiekt(std::make_unique<JajoSlimaka>(akwarium));
             }
         }
@@ -113,7 +116,7 @@ void Slimak::rysuj(QPainter *qp) {
     qp->drawPixmap(x, y, pixmap);
 }
 
-bool Slimak::isChoroba() const {
+bool Slimak::wezChoroba() const {
     return choroba;
 }
 
@@ -121,6 +124,6 @@ Slimak::~Slimak() {
     std::cout << "Usuwam slimaka\n";
 }
 
-double Slimak::getZarlocznosc() const {
+double Slimak::wezZarlocznosc() const {
     return zarlocznosc;
 }
