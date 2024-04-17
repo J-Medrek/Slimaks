@@ -17,8 +17,7 @@ bool JajoSlimaka::symulujEliminacje() {
         wykluj();
         return true;
     }
-    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA
-        && akwarium->getZdarzenie().getCzasTrwania() == 0) {
+    if (akwarium->wezZdarzenie().wezZdarzenieLosowe() == ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA) {
         return true;
     }
     return false;

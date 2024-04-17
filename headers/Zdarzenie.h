@@ -11,13 +11,13 @@ private:
 public:
     Zdarzenie(int czasTrwania, ZdarzenieLosowe zdarzenieLosowe);
 
-    int getCzasTrwania() const;
+    int wezCzasTrwania() const;
 
-    void setCzasTrwania(int czasTrwania);
+    void ustawCzasTrwania(int czasTrwania);
 
-    ZdarzenieLosowe getZdarzenieLosowe() const;
+    ZdarzenieLosowe wezZdarzenieLosowe() const;
 
-    void setZdarzenieLosowe(ZdarzenieLosowe zdarzenieLosowe);
+    void ustawZdarzenieLosowe(ZdarzenieLosowe zdarzenieLosowe);
 };
 
 

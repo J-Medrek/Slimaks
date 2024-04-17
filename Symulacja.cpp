@@ -7,62 +7,68 @@
 Symulacja::Symulacja(Akwarium *akwarium) : akwarium(akwarium) {}
 
 void Symulacja::rozpocznijSymulacje() {
-    for (int i = 0; i < akwarium->getPoczatkowaIloscRoslin(); ++i) {
-        akwarium->dodajObiekt(std::make_unique<Roslina>(akwarium->getWzrostRoslin()));
+    //inicjalizacja wstępnych obiektów
+    for (int i = 0; i < akwarium->wezPoczatkowaIloscRoslin(); ++i) {
+        akwarium->dodajObiekt(std::make_unique<Roslina>(akwarium));
     }
-    for (int i = 0; i < akwarium->getPoczatkowaIloscSlimakow(); ++i) {
+    for (int i = 0; i < akwarium->wezPoczatkowaIloscSlimakow(); ++i) {
         akwarium->dodajObiekt(std::make_unique<Slimak>(12, akwarium));
     }
-    akwarium->ustawNumerIteracji(1);
+    akwarium->zwiekszNumerIteracji();
     emit koniecRozpoczeniaSymulacji();
 }
 
 void Symulacja::symulujIteracje() {
     std::this_thread::sleep_for(std::chrono::milliseconds(stale::CZAS_ITERACJI_MS));
-    if (akwarium->getIloscRoslin() != 0 && akwarium->getIloscSlimakow() != 0) {
+    if (akwarium->wyznaczIloscObiektow<Roslina>() != 0 && akwarium->wyznaczIloscObiektow<Slimak>() != 0) {
         symulujZdarzenieLosowe();
 
-        int i = 0;
-        while (i < akwarium->getSymulowaneObiekty().size()) {
-            akwarium->getSymulowaneObiekty()[i]->symulujZachowanie();
-            i++;
+        // wywołanie symulacji dla każdego obiektu
+        for (int j = 0; j < akwarium->wezSymulowaneObiekty().size(); j++) {
+            akwarium->wezSymulowaneObiekty()[j]->symulujZachowanie();
         }
 
-        i = 0;
-        while (i < akwarium->getSymulowaneObiekty().size()) {
-            if (akwarium->getSymulowaneObiekty()[i]->symulujEliminacje()) {
-                akwarium->usunObiekt(akwarium->getSymulowaneObiekty()[i]);
+        // usuwanie wyeliminowanych obiektow
+        int i = 0;
+        while (i < akwarium->wezSymulowaneObiekty().size()) {
+            if (akwarium->wezSymulowaneObiekty()[i]->symulujEliminacje()) {
+                akwarium->usunObiekt(akwarium->wezSymulowaneObiekty()[i]);
             } else {
                 i++;
             }
         }
-        akwarium->ustawNumerIteracji(akwarium->getNumerIteracji() + 1);
+        akwarium->zwiekszNumerIteracji();
         emit koniecIteracji();
     }
 }
 
 void Symulacja::symulujZdarzenieLosowe() {
-    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::BRAK) {
-        akwarium->getZdarzenie().setZdarzenieLosowe(losujZdarzenieLosowe());
-        akwarium->getZdarzenie().setCzasTrwania(1);
+    //losowanie zdarzenia losowego w przypadku braku trwania zdarzenia
+    if (akwarium->wezZdarzenie().wezZdarzenieLosowe() == ZdarzenieLosowe::BRAK) {
+        akwarium->wezZdarzenie().ustawZdarzenieLosowe(losujZdarzenieLosowe());
+        akwarium->wezZdarzenie().ustawCzasTrwania(1);
     } else {
-        akwarium->getZdarzenie().setCzasTrwania(akwarium->getZdarzenie().getCzasTrwania() + 1);
+        akwarium->wezZdarzenie().ustawCzasTrwania(akwarium->wezZdarzenie().wezCzasTrwania() + 1);
     }
 
-    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
-        if (akwarium->iloscChorychSlimakow() == 0 && akwarium->getZdarzenie().getCzasTrwania() != 1) {
-            akwarium->getZdarzenie().setCzasTrwania(0);
-            akwarium->getZdarzenie().setZdarzenieLosowe(ZdarzenieLosowe::BRAK);
+    // w przypadku gdy wszytkie slimaki wyzdrowialy i nie jest to poczatek choroby zakoncz zdarzenie
+    if (akwarium->wezZdarzenie().wezZdarzenieLosowe() == ZdarzenieLosowe::CHOROBA) {
+        if (akwarium->iloscChorychSlimakow() == 0 && akwarium->wezZdarzenie().wezCzasTrwania() != 1) {
+            akwarium->wezZdarzenie().ustawCzasTrwania(0);
+            akwarium->wezZdarzenie().ustawZdarzenieLosowe(ZdarzenieLosowe::BRAK);
         }
     }
 
-    if (akwarium->getZdarzenie().getZdarzenieLosowe() == ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA) {
-        if (akwarium->getZdarzenie().getCzasTrwania() == 1) {
-            akwarium->setWzrostRoslin(akwarium->getWzrostRoslin() - 0.05);
+    if (akwarium->wezZdarzenie().wezZdarzenieLosowe() == ZdarzenieLosowe::ANOMALIA_TEMPERATUROWA) {
+        // w przypadku gdy rozpoczęła się anomalia zmniejsz wzrost roślin
+        if (akwarium->wezZdarzenie().wezCzasTrwania() == 1) {
+            akwarium->ustawWzrostRoslin(akwarium->wezWzrostRoslin() - akwarium->wezSpadekWzrostuRoslin());
         }
-        if (akwarium->getZdarzenie().getCzasTrwania() == 15) {
-            akwarium->getZdarzenie().setZdarzenieLosowe(ZdarzenieLosowe::BRAK);
-            akwarium->getZdarzenie().setCzasTrwania(0);
+        // w przypadku gdy minal czas trwania zdarzenia, zakoncz anomalie ,przywróć wzrost roślin
+        if (akwarium->wezZdarzenie().wezCzasTrwania() == akwarium->wezCzasTrwaniaAnomalii()) {
+            akwarium->wezZdarzenie().ustawZdarzenieLosowe(ZdarzenieLosowe::BRAK);
+            akwarium->wezZdarzenie().ustawCzasTrwania(0);
+            akwarium->ustawWzrostRoslin(akwarium->wezWzrostRoslin() + akwarium->wezSpadekWzrostuRoslin());
         }
     }
 }
@@ -70,7 +76,7 @@ void Symulacja::symulujZdarzenieLosowe() {
 ZdarzenieLosowe Symulacja::losujZdarzenieLosowe() {
     std::mt19937 generator(rd());
     std::discrete_distribution<> prawdopodobienstwoZdarzenLosowych(
-            {1 - stale::SZANSA_NA_ANOMALIE - stale::SZANSA_NA_CHOROBE, stale::SZANSA_NA_CHOROBE,
-             stale::SZANSA_NA_ANOMALIE});
+            {1 - akwarium->wezSzansaAnomalia() - akwarium->wezSzansaChoroba(), akwarium->wezSzansaChoroba(),
+             akwarium->wezSzansaAnomalia()});
     return ZdarzenieLosowe(prawdopodobienstwoZdarzenLosowych(generator));
 }
